@@ -25,7 +25,8 @@ def is_line_corrupted(line, closing_stack):
         next_close = OPENING[character]
         closing_stack.append(next_close)
     elif closing_stack:
-        next_character = closing_stack.pop(len(closing_stack ) - 1)
+        next_character = closing_stack[-1]
+        closing_stack = closing_stack[:-1]
         if character != next_character:
             corrupted, illegal = True, character
     next_corrupted, next_illegal = is_line_corrupted(line, closing_stack)
@@ -49,12 +50,14 @@ remove_all_corrupted = lambda lines: [line for line in lines if not is_line_corr
 def get_closing_queue(line, closing_stack):
     if not line:
         return closing_stack
-    character = line.pop(0)
+    character = line[0]
+    line = line[1:]
     if character in OPENING:
         next_close = OPENING[character]
         closing_stack.append(next_close)
     elif closing_stack:
-        closing_stack.pop(len(closing_stack ) - 1)
+        next_character = closing_stack[-1]
+        closing_stack = closing_stack[:-1]
     return get_closing_queue(line, closing_stack)
 
 get_autocomplete_list = lambda line: get_closing_queue(line, [])
@@ -74,7 +77,6 @@ if __name__ == "__main__":
     lines = load_input()
     score = score_all_corrupted(lines)
     print(f"Corrupted Lines Scored: {score}")
-    lines = load_input()
     uncorrupted_lines = remove_all_corrupted(lines)
     middle_score = select_middle(complete_and_score_all(uncorrupted_lines))
     print(f"Middle autocomplete score: {middle_score}")
